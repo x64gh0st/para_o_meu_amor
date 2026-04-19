@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💕 2 Meses Juntos – Pedro & Sara 💕</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  :root {
+    --rose:    #e05070;
+    --rose-dk: #b83050;
+    --rose-lt: #ffd6e0;
+    --cream:   #fff5f7;
+    --text:    #7a1530;
+    --gold:    #f4a261;
+  }
+
+  /* ─── Background ─── */
+  body {
+    min-height: 100vh;
+    background: linear-gradient(160deg, #ffe0eb 0%, #ffd6e0 40%, #ffecd2 100%);
+    font-family: 'Georgia', serif;
+    overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 16px 60px;
+  }
+
+  /* ─── Canvas de partículas ─── */
+  #canvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── Layout ─── */
+  .page { position:relative; z-index:1; width:100%; max-width:560px; display:flex; flex-direction:column; gap:20px; align-items:center; }
+
+  /* ─── Cabeçalho ─── */
+  .header { text-align:center; animation: fadeDown .8s ease both; }
+  .header h1 { font-size:clamp(1.8rem, 6vw, 2.6rem); color:var(--rose-dk); letter-spacing:1px; line-height:1.2; text-shadow:0 2px 12px rgba(176,30,60,.25); }
+  .header h1 span { display:inline-block; animation:pulse 1.8s ease-in-out infinite; }
+  .header p { margin-top:6px; color:#c05070; font-size:1.05rem; font-style:italic; }
+  .badge { display:inline-block; margin-top:10px; background:rgba(255,255,255,.55); color:var(--rose-dk); font-size:.85rem; font-weight:bold; padding:5px 18px; border-radius:30px; border:1.5px solid rgba(224,80,112,.35); backdrop-filter:blur(6px); }
+
+  /* ─── Contador ─── */
+  .counter { width:100%; background:linear-gradient(135deg, var(--rose), var(--rose-dk)); color:#fff; border-radius:22px; padding:18px 24px; text-align:center; box-shadow:0 8px 30px rgba(176,30,60,.3); animation:fadeUp .8s .2s ease both; }
+  .counter h2 { font-size:2.2rem; letter-spacing:2px; }
+  .counter p { font-size:.95rem; opacity:.9; margin-top:4px; }
+  #live-counter { font-size:.78rem; margin-top:8px; opacity:.75; letter-spacing:.5px; }
+
+  /* ─── Cena dos gatinhos ─── */
+  .scene {
+    position:relative; width:100%;
+    background:rgba(255,255,255,.45);
+    border:2px solid rgba(255,255,255,.7);
+    border-radius:28px;
+    padding:40px 24px 22px;
+    backdrop-filter:blur(12px);
+    box-shadow:0 10px 40px rgba(224,80,112,.2);
+    display:flex; align-items:flex-end; justify-content:center; gap:0;
+    animation:fadeUp .8s .35s ease both;
+  }
+  .big-heart { position:absolute; top:-28px; left:50%; transform:translateX(-50%); font-size:3rem; animation:floatHeart 2.2s ease-in-out infinite; filter:drop-shadow(0 0 8px rgba(224,80,112,.6)); }
+  @keyframes floatHeart { 0%,100%{transform:translateX(-50%) translateY(0) scale(1)} 50%{transform:translateX(-50%) translateY(-14px) scale(1.18)} }
+
+  .cat-wrap { display:flex; flex-direction:column; align-items:center; gap:8px; flex:1; }
+  .cat { font-size:5rem; cursor:pointer; transition:transform .25s; }
+  .cat:hover { transform:scale(1.15) rotate(-6deg); }
+  .cat-boy { animation:catBob 2s ease-in-out infinite; }
+  .cat-girl { animation:catBob 2s ease-in-out infinite .5s; }
+  @keyframes catBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+  .name-tag { font-size:.82rem; font-weight:bold; color:var(--rose-dk); background:rgba(255,255,255,.75); padding:3px 14px; border-radius:20px; border:1px solid rgba(224,80,112,.25); }
+
+  .hearts-mid { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding-bottom:14px; flex:0 0 64px; }
+  .mh { font-size:1.6rem; animation:miniFloat 1.6s ease-in-out infinite; }
+  .mh:nth-child(1){animation-delay:0s} .mh:nth-child(2){animation-delay:.28s} .mh:nth-child(3){animation-delay:.56s}
+  @keyframes miniFloat { 0%,100%{transform:translateY(0) scale(1);opacity:1} 50%{transform:translateY(-10px) scale(1.3);opacity:.7} }
+
+  /* ─── Banner rolante ─── */
+  .banner-wrap { width:100%; overflow:hidden; background:rgba(255,255,255,.45); border-radius:18px; padding:12px 0; border:1.5px solid rgba(224,80,112,.3); backdrop-filter:blur(8px); animation:fadeUp .8s .5s ease both; }
+  .banner-track { display:flex; white-space:nowrap; animation:scroll 16s linear infinite; }
+  .banner-track span { font-size:1.1rem; color:var(--rose-dk); font-weight:bold; padding:0 18px; }
+  @keyframes scroll { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+  /* ─── Mensagem ─── */
+  .msg { width:100%; background:rgba(255,255,255,.5); border-radius:22px; padding:22px 26px; border:1.5px solid rgba(224,80,112,.3); backdrop-filter:blur(8px); animation:fadeUp .8s .65s ease both; }
+  .msg p { color:var(--text); font-size:1rem; line-height:1.85; text-align:center; }
+  .msg .eline { font-size:1.6rem; text-align:center; margin:10px 0; }
+
+  /* ─── Botões ─── */
+  .btns { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; animation:fadeUp .8s .8s ease both; }
+  .btn {
+    background:linear-gradient(135deg, #ff8fab, var(--rose));
+    color:#fff; border:none; padding:12px 26px;
+    border-radius:30px; font-size:1rem; cursor:pointer;
+    font-family:'Georgia',serif;
+    box-shadow:0 6px 18px rgba(224,80,112,.35);
+    transition:transform .2s, box-shadow .2s;
+  }
+  .btn:hover { transform:scale(1.07); box-shadow:0 10px 28px rgba(224,80,112,.5); }
+  .btn:active { transform:scale(.96); }
+  .btn.outline { background:rgba(255,255,255,.55); color:var(--rose-dk); border:1.5px solid rgba(224,80,112,.4); box-shadow:none; }
+  .btn.outline:hover { background:rgba(255,255,255,.8); }
+
+  /* ─── Modal ─── */
+  .overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:none; align-items:center; justify-content:center; padding:16px; }
+  .overlay.open { display:flex; }
+  .modal { background:linear-gradient(155deg,#fff5f7,#ffe4ec); border-radius:26px; padding:38px 32px; max-width:380px; width:100%; text-align:center; box-shadow:0 24px 60px rgba(176,30,60,.35); border:2px solid rgba(224,80,112,.3); animation:popIn .45s cubic-bezier(.175,.885,.32,1.275) both; }
+  @keyframes popIn { from{transform:scale(.2);opacity:0} to{transform:scale(1);opacity:1} }
+  .modal h2 { color:var(--rose-dk); font-size:1.8rem; margin-bottom:12px; }
+  .modal p { color:var(--text); font-size:1.05rem; line-height:1.8; margin-bottom:20px; }
+  .modal .close { background:linear-gradient(135deg,#ff8fab,var(--rose-dk)); color:#fff; border:none; padding:10px 26px; border-radius:20px; font-size:1rem; cursor:pointer; transition:transform .2s; }
+  .modal .close:hover { transform:scale(1.08); }
+
+  /* ─── Animações globais ─── */
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-22px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes fadeUp   { from{opacity:0;transform:translateY(22px)}  to{opacity:1;transform:translateY(0)} }
+  @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+  /* ─── Responsivo ─── */
+  @media(max-width:400px){ .cat{font-size:3.8rem} .scene{padding:36px 12px 16px; gap:0} }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<div class="page">
+
+  <!-- Cabeçalho -->
+  <div class="header">
+    <h1><span>💕</span> 2 Meses Juntos! <span>💕</span></h1>
+    <p>Uma história linda que está só começando...</p>
+    <div class="badge">📅 17 de Abril de 2026</div>
+  </div>
+
+  <!-- Contador -->
+  <div class="counter">
+    <h2>🗓️ 2 Meses de Amor</h2>
+    <p>de cumplicidade, carinho e muita felicidade!</p>
+    <div id="live-counter">⏱️ Calculando...</div>
+  </div>
+
+  <!-- Cena dos gatinhos -->
+  <div class="scene">
+    <div class="big-heart">💖</div>
+    <div class="cat-wrap">
+      <div class="cat cat-boy" id="catBoy">🐱</div>
+      <div class="name-tag">Pedro Henrique 💙</div>
+    </div>
+    <div class="hearts-mid">
+      <div class="mh">💗</div>
+      <div class="mh">💕</div>
+      <div class="mh">💓</div>
+    </div>
+    <div class="cat-wrap">
+      <div class="cat cat-girl" id="catGirl">🐱</div>
+      <div class="name-tag">Sara 💗</div>
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner-wrap">
+    <div class="banner-track">
+      <span>💕 Eu te amo</span><span>🌹 Te adoro</span><span>💖 Você é tudo pra mim</span>
+      <span>✨ Feliz 2 meses!</span><span>🦋 Meu amor</span><span>💗 Amo você, Sara</span>
+      <span>🌸 Você me faz tão feliz</span><span>🎀 Pedro &amp; Sara</span><span>💫 Para sempre</span>
+      <!-- repetição para loop sem lacuna -->
+      <span>💕 Eu te amo</span><span>🌹 Te adoro</span><span>💖 Você é tudo pra mim</span>
+      <span>✨ Feliz 2 meses!</span><span>🦋 Meu amor</span><span>💗 Amo você, Sara</span>
+      <span>🌸 Você me faz tão feliz</span><span>🎀 Pedro &amp; Sara</span><span>💫 Para sempre</span>
+    </div>
+  </div>
+
+  <!-- Mensagem -->
+  <div class="msg">
+    <div class="eline">🌷✨💖✨🌷</div>
+    <p>
+      Sara, nesses 2 meses ao seu lado aprendi o que é acordar com vontade de sorrir.<br><br>
+      Cada momento com você é especial — os risos, as conversas até tarde, os olhares que dizem mais do que as palavras.<br><br>
+      Você transformou os meus dias em algo muito mais bonito. <strong>Obrigado por existir na minha vida. ❤️</strong>
+    </p>
+    <div class="eline">🐱💕🐱</div>
+  </div>
+
+  <!-- Botões -->
+  <div class="btns">
+    <button class="btn" onclick="showSurprise()">🎁 Uma surpresinha...</button>
+    <button class="btn outline" id="musicBtn" onclick="toggleMusic()">🎵 Tocar música</button>
+    <button class="btn outline" onclick="heartBurst()">💖 Lançar corações!</button>
+  </div>
+
+</div>
+
+<!-- Modal surpresa -->
+<div class="overlay" id="overlay" onclick="closeSurprise(event)">
+  <div class="modal" id="modal">
+    <h2>💌 Para a Sara</h2>
+    <p>
+      Você sabe que faz meu coração disparar de um jeito que eu nunca esperava?<br><br>
+      Cada dia ao seu lado é um presente. Cada abraço é onde eu quero estar.<br><br>
+      Obrigado por cada risada, cada mensagem de "boa noite" e por ser exatamente quem você é. 🌹<br><br>
+      <strong>Te amo muito, meu amor. 💕</strong>
+    </p>
+    <button class="close" onclick="closeSurprise()">Com amor ❤️</button>
+  </div>
+</div>
+
+<script>
+/* ─── Partículas (corações + estrelas) ─── */
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize',resize);
+
+const EMOJIS = ['💗','💕','💖','✨','💓','🌸','⭐'];
+
+class Particle {
+  constructor(burst=false, bx=0, by=0){
+    this.burst = burst;
+    if(burst){
+      this.x = bx; this.y = by;
+      this.vx = (Math.random()-0.5)*6;
+      this.vy = -Math.random()*7-2;
+    } else {
+      this.x = Math.random()*W; this.y = H+20;
+      this.vx = (Math.random()-.5)*1.2;
+      this.vy = -(Math.random()*1.2+0.4);
+    }
+    this.emoji = EMOJIS[Math.floor(Math.random()*EMOJIS.length)];
+    this.size  = burst ? Math.random()*16+14 : Math.random()*14+8;
+    this.alpha = 1;
+    this.spin  = (Math.random()-.5)*.06;
+    this.angle = 0;
+    this.life  = burst ? 1 : Math.random()*.5+.5;
+  }
+  update(){
+    this.x += this.vx; this.y += this.vy;
+    this.vy += .04; this.angle += this.spin;
+    if(this.burst) this.alpha -= .012;
+    else this.alpha -= .003;
+    return this.alpha > 0;
+  }
+  draw(){
+    ctx.save();
+    ctx.globalAlpha = Math.max(0,this.alpha);
+    ctx.translate(this.x,this.y);
+    ctx.rotate(this.angle);
+    ctx.font = `${this.size}px serif`;
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText(this.emoji,0,0);
+    ctx.restore();
+  }
+}
+
+let frameCount = 0;
+function animate(){
+  requestAnimationFrame(animate);
+  ctx.clearRect(0,0,W,H);
+  frameCount++;
+  if(frameCount % 40 === 0) particles.push(new Particle());
+  particles = particles.filter(p=>{ const alive=p.update(); p.draw(); return alive; });
+}
+animate();
+
+function heartBurst(){
+  const cx = W/2, cy = H/2;
+  for(let i=0;i<40;i++) particles.push(new Particle(true,cx,cy));
+}
+
+/* ─── Contador ao vivo ─── */
+function updateCounter(){
+  const start = new Date('2026-02-17T00:00:00');
+  const now   = new Date();
+  const diff  = now - start;
+  const d = Math.floor(diff/86400000);
+  const h = Math.floor((diff%86400000)/3600000);
+  const m = Math.floor((diff%3600000)/60000);
+  const s = Math.floor((diff%60000)/1000);
+  document.getElementById('live-counter').textContent =
+    `⏱️ ${d} dias, ${h}h ${m}min ${s}s juntos ❤️`;
+}
+updateCounter(); setInterval(updateCounter,1000);
+
+/* ─── Modal ─── */
+function showSurprise(){ document.getElementById('overlay').classList.add('open'); }
+function closeSurprise(e){
+  if(!e || e.target===document.getElementById('overlay'))
+    document.getElementById('overlay').classList.remove('open');
+}
+
+/* ─── Gatos saltam ao clicar ─── */
+['catBoy','catGirl'].forEach(id=>{
+  document.getElementById(id).addEventListener('click',function(){
+    this.style.transition='transform .15s';
+    this.style.transform='scale(1.4) rotate(-10deg)';
+    setTimeout(()=>this.style.transform='',300);
+    for(let i=0;i<12;i++) particles.push(new Particle(true,
+      this.getBoundingClientRect().left+30,
+      this.getBoundingClientRect().top+30));
+  });
+});
+
+/* ─── Música (Web Audio API) ─── */
+let audioCtx = null, musicOn = false, musicTimeout = null;
+
+const MELODY = [
+  523.25,587.33,659.25,698.46,783.99,
+  698.46,659.25,587.33,523.25,493.88,
+  523.25,587.33,659.25,587.33,523.25
+];
+
+function playNote(freq, when, dur){
+  const osc  = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(freq, when);
+  gain.gain.setValueAtTime(0, when);
+  gain.gain.linearRampToValueAtTime(.18, when+.05);
+  gain.gain.linearRampToValueAtTime(0,  when+dur-.05);
+  osc.connect(gain); gain.connect(audioCtx.destination);
+  osc.start(when); osc.stop(when+dur);
+}
+
+function playMelody(){
+  if(!musicOn) return;
+  let t = audioCtx.currentTime;
+  MELODY.forEach(f=>{ playNote(f,t,.45); t+=.5; });
+  musicTimeout = setTimeout(playMelody, MELODY.length*500+600);
+}
+
+function toggleMusic(){
+  const btn = document.getElementById('musicBtn');
+  if(!musicOn){
+    if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    musicOn = true;
+    btn.textContent = '🔇 Parar música';
+    playMelody();
+  } else {
+    musicOn = false;
+    clearTimeout(musicTimeout);
+    btn.textContent = '🎵 Tocar música';
+  }
+}
+</script>
+</body>
+</html>
